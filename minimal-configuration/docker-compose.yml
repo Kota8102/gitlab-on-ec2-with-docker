@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  gitlab:
+    image: 'gitlab/gitlab-ee:latest'
+    
+    # コンテナが停止した際に自動で再起動する設定
+    restart: always
+    
+    # GitLabの環境変数の設定
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # GitLabの外部アクセスURLを設定
+        external_url 'http://gitlab.example.com'
+        
+        # GitLab内部のタイムゾーンを設定
+        gitlab_rails['time_zone'] = 'Asia/Tokyo'
+        
+        # Nginxのリッスンポートを80 (HTTP) に設定
+        nginx['listen_port'] = 80
+
+    # ホストのポート80をコンテナのポート80にマッピング
+    ports:
+      - '80:80'
+    
+    # ホストとコンテナ間でのボリュームマッピング
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab' # 設定ファイルの保存場所
+      - '/srv/gitlab/logs:/var/log/gitlab' # ログファイルの保存場所
+      - '/srv/gitlab/data:/var/opt/gitlab' # GitLabのデータ保存場所
